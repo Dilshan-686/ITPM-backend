@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 const User = mongoose.model('user');
 const AuthenticateMiddleware = require('../middleware/authenticate');
@@ -31,64 +32,60 @@ module.exports = (app) => {
         }
     });
 
-    // get User
-    module.exports = (app) => {
-        app.get('/get-user', AuthenticateMiddleware, async (req, res) => {
-            const { accessToken } = req.headers;
-            if (!accessToken) {
-                return res.send({ message: null, error: 'Access token missing' });
-            }
-
-            try {
-                const decodedToken = jwt.decode(accessToken, env.secret);
-                const userId = decodedToken.UserId;
-                console.log(userId);
-                const user = await User.findOne({ UserId: userId });
-
-                if (user) {
-                    return res.send({ user });
-                } else {
-                    return res.send({ message: null, error: 'User not found' });
-                }
-            } catch (error) {
-                console.error('Error fetching user:', error);
-                if (error.name === 'TokenExpiredError') {
-                    return res.send({ message: null, error: 'Access token expired' });
-                } else {
-                    return res.send('Internal Server Error');
-                }
-            }
-        });
-    };
-
     // sign in
-    module.exports = (app) => {
-        app.get('/auth/sign-in', async (req, res) => {
-            const { UserId, UserName, PassWord } = req.body;
+    app.post('/auth/sign-in', async (req, res) => {
+        const { UserName, PassWord } = req.body;
 
-            if (UserId && UserName && PassWord) {
-                return res.send({ message: null, error: 'required filed missing' });
-            }
+        if (!UserName && !PassWord) {
+            return res.send({ message: null, error: 'required filed missing' });
+        }
 
-            try {
-                let user = await User.findOne({ UserName });
-                if (user) {
-                    if (PassWord === user.PassWord) {
-                        const accessToken = jwt.sign({ UserId: user.UserId, Name: user.Name }, env.secret);
-                        return res.send({ message: 'User signed in successfully!', accessToken, error: null });
-                    } else {
-                        return res.send({
-                            message: null,
-                            error: 'invalid credentials meaning check username and password',
-                        });
-                    }
+        try {
+            let user = await User.findOne({ UserName });
+            if (user) {
+                if (PassWord === user.PassWord) {
+                    const accessToken = jwt.sign({ UserId: user.UserId, Name: user.Name }, env.secret);
+                    return res.send({ message: 'User signed in successfully!', accessToken, error: null });
                 } else {
-                    return res.send({ message: null, error: 'user not registered' });
+                    return res.send({
+                        message: null,
+                        error: 'invalid credentials meaning check username and password',
+                    });
                 }
-            } catch (error) {
-                console.error('Error signing in user:', error);
+            } else {
+                return res.send({ message: null, error: 'user not registered' });
+            }
+        } catch (error) {
+            console.error('Error signing in user:', error);
+            return res.send('Internal Server Error');
+        }
+    });
+
+    // get User
+    app.get('/auth/get-user', AuthenticateMiddleware, async (req, res) => {
+        const { accessToken } = req.headers;
+        if (!accessToken) {
+            return res.send({ message: null, error: 'Access token missing' });
+        }
+
+        try {
+            const decodedToken = jwt.decode(accessToken, env.secret);
+            const userId = decodedToken.UserId;
+            console.log(userId);
+            const user = await User.findOne({ UserId: userId });
+
+            if (user) {
+                return res.send({ user });
+            } else {
+                return res.send({ message: null, error: 'User not found' });
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            if (error.name === 'TokenExpiredError') {
+                return res.send({ message: null, error: 'Access token expired' });
+            } else {
                 return res.send('Internal Server Error');
             }
-        });
-    };
+        }
+    });
 };
