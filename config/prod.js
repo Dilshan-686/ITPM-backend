@@ -1,4 +1,4 @@
 module.exports = {
-    mongo_ps: process.env.mongo_ps,
+    mongo_url: process.env.mongo_url,
     secret: process.env.secret,
 };

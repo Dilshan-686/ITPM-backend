@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-mongoose.connect(`mongodb+srv://test:${env.mongo_ps}@test.wgiswft.mongodb.net/`);
+mongoose.connect(env.mongo_url);
 
 const app = express();
 
