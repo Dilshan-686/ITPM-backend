@@ -18,6 +18,7 @@ require('./models/user');
 
 //routes
 require('./routes/authRoutes')(app);
+require('./routes/payment')(app);
 
 console.log('running', env.mongo_ps);
 
