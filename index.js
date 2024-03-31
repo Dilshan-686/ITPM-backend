@@ -9,12 +9,20 @@ mongoose.connect(env.mongo_url);
 const app = express();
 
 // enable cross-origin dnt remove
-app.use(cors());
+app.use(
+    cors({
+        origin: '*',
+        allowedHeaders: '*',
+    })
+);
+
+app.options('*', cors());
 
 app.use(bodyParser.json());
 
 // models
 require('./models/user');
+require('./models/payment');
 
 //routes
 require('./routes/authRoutes')(app);

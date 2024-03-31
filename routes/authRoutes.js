@@ -21,7 +21,7 @@ module.exports = (app) => {
             let user = await User.findOne({ UserName });
             console.log(user, 'user found <<<');
             if (!user) {
-                user = await User.create({ UserId, UserName, PassWord });
+                await User.create({ UserId, UserName, PassWord });
                 res.send({ message: 'User signed up successfully!', error: null });
             } else {
                 res.send({ message: null, error: 'existing user' });
@@ -44,7 +44,7 @@ module.exports = (app) => {
             let user = await User.findOne({ UserName });
             if (user) {
                 if (PassWord === user.PassWord) {
-                    const accessToken = jwt.sign({ UserId: user.UserId, Name: user.Name }, env.secret);
+                    const accessToken = jwt.sign({ UserId: user.UserId, UserName: user.UserName }, env.secret);
                     return res.send({ message: 'User signed in successfully!', accessToken, error: null });
                 } else {
                     return res.send({
