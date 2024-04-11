@@ -1,6 +1,6 @@
 const env = require('../config/env');
 const jwt = require('jsonwebtoken');
-const authenticate = require('../middleware/authenticate');
+const AuthenticateMiddleware = require('../middleware/authenticate');
 const mongoose = require('mongoose');
 const User = mongoose.model('user');
 const Payment = mongoose.model('payment');
@@ -12,7 +12,7 @@ module.exports = (app) => {
         res.send('Stripe GATE way');
     });
 
-    app.post('/checkout', async (req, res) => {
+    app.post('/checkout', AuthenticateMiddleware, async (req, res) => {
         const { usd } = req.body;
         console.log(usd);
         if (usd) {
@@ -43,7 +43,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/checkout/success/save-payment', async (req, res) => {
+    app.post('/checkout/success/save-payment', AuthenticateMiddleware, async (req, res) => {
         const { authorization } = req.headers;
         const { price } = req.body;
         const decodedToken = jwt.decode(authorization, env.secret);
@@ -69,7 +69,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/payment/user-history', async (req, res) => {
+    app.post('/payment/user-history', AuthenticateMiddleware, async (req, res) => {
         const { authorization } = req.headers;
         const decodedToken = jwt.decode(authorization, env.secret);
         if (decodedToken?.UserId) {
