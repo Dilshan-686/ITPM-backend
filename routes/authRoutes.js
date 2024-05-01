@@ -63,19 +63,47 @@ module.exports = (app) => {
 
     // get User
     app.get('/auth/get-user', AuthenticateMiddleware, async (req, res) => {
-        const { accessToken } = req.headers;
-        if (!accessToken) {
+        const { authorization } = req.headers;
+        if (!authorization) {
             return res.send({ message: null, error: 'Access token missing' });
         }
 
         try {
-            const decodedToken = jwt.decode(accessToken, env.secret);
+            const decodedToken = jwt.decode(authorization, env.secret);
             const userId = decodedToken.UserId;
             console.log(userId);
             const user = await User.findOne({ UserId: userId });
 
             if (user) {
                 return res.send({ user });
+            } else {
+                return res.send({ message: null, error: 'User not found' });
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            if (error.name === 'TokenExpiredError') {
+                return res.send({ message: null, error: 'Access token expired' });
+            } else {
+                return res.send('Internal Server Error');
+            }
+        }
+    });
+
+    // delete user
+    app.get('/auth/user-danger-zone', AuthenticateMiddleware, async (req, res) => {
+        const { authorization } = req.headers;
+        if (!authorization) {
+            return res.send({ message: null, error: 'Access token missing' });
+        }
+
+        try {
+            const decodedToken = jwt.decode(authorization, env.secret);
+            const userId = decodedToken.UserId;
+            console.log(userId);
+            const user = await User.deleteOne({ UserId: userId });
+
+            if (user) {
+                return res.send({ message: 'User account deleted Successfully' });
             } else {
                 return res.send({ message: null, error: 'User not found' });
             }
