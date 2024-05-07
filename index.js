@@ -28,6 +28,8 @@ require('./models/payment');
 require('./routes/authRoutes')(app);
 require('./routes/payment')(app);
 require('./routes/chatBotResponse')(app);
+app.use('/supply', require('./routes/supply.route'));
+app.use('/product', require('./routes/product.route'));
 
 console.log('running', env.mongo_ps);
 
