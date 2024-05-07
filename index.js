@@ -27,6 +27,7 @@ require('./models/payment');
 //routes
 require('./routes/authRoutes')(app);
 require('./routes/payment')(app);
+require('./routes/chatBotResponse')(app);
 
 console.log('running', env.mongo_ps);
 
