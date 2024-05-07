@@ -6,7 +6,7 @@ import sys
 
 
 questions = [
-   
+    "hi yo ",
     "What items do you have available in your store?",
     "What are your store hours? open time ? active ours",
     "Do you offer sports apparel?",
@@ -19,6 +19,7 @@ questions = [
 ]
 
 answers = [
+    "Hi. how can i help you today?",
     "We have shirts, pants, and shoes available in our store.",
     "Our store is open every day from 9 AM to 10 PM.",
     "We have a selection of sports apparel for various activities.",
